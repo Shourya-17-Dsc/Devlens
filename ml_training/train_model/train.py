@@ -10,7 +10,7 @@ Usage:
 The "ground truth" dataset is a manually labelled CSV where each row
 is a developer and the target column is `skill_score` (0-10).
 
-For bootstrapping the MVP, we use SYNTHETIC data generation
+ We use SYNTHETIC data generation
 that encodes reasonable domain assumptions. Replace with real
 labelled data as the platform grows.
 """
