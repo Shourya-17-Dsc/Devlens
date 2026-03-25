@@ -1,6 +1,3 @@
-// Next.js Dashboard Page
-// Uses Chart.js for visualisations and TailwindCSS for layout.
-// In production, replace MOCK_DATA with a real API call to /api/v1/analyze/{username}
 
 import { useState, useEffect, useRef } from "react";
 import Head from "next/head";
