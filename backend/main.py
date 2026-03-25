@@ -1,12 +1,4 @@
-"""
-main.py — FastAPI Application Entry Point
-==========================================
-This is the root of the backend service.
-It wires together:
-  - CORS middleware (so the Next.js frontend can talk to us)
-  - All API route handlers (from api/routes.py)
-  - Startup events (model warm-up, DB connection check)
-"""
+
 
 import logging
 from contextlib import asynccontextmanager
