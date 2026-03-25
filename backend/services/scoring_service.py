@@ -1,14 +1,11 @@
 """
 ================================================================================
-ML Scoring Service
+ML Scoring
 ================================================================================
 Loads the trained RandomForest model and runs skill score inference.
 Also handles the rule-based fallback when no trained model exists,
 and generates human-readable strength/weakness analysis.
 
-Architecture Note:
-  This service acts as the "brain" of the system. It receives features,
-  runs the model (or heuristic fallback), and returns structured analysis.
 ================================================================================
 """
 
@@ -29,9 +26,9 @@ MODEL_PATH = MODEL_DIR / "skill_model.joblib"
 SCALER_PATH = MODEL_DIR / "feature_scaler.joblib"
 
 
-# ---------------------------------------------------------------------------
+
 # Model Loading (lazy singleton)
-# ---------------------------------------------------------------------------
+
 _model  = None
 _scaler = None
 
@@ -60,9 +57,9 @@ def _load_model():
     return _model, _scaler
 
 
-# ---------------------------------------------------------------------------
+
 # Heuristic Scorer (no ML model needed)
-# ---------------------------------------------------------------------------
+
 
 def heuristic_score(features: dict) -> float:
     """
@@ -114,9 +111,9 @@ def heuristic_score(features: dict) -> float:
     return round(min((raw_score / max_score) * 10, 10.0), 2)
 
 
-# ---------------------------------------------------------------------------
+
 # ML Model Scorer
-# ---------------------------------------------------------------------------
+
 
 def ml_score(features: dict, feature_names: list[str]) -> float:
     """
@@ -138,9 +135,9 @@ def ml_score(features: dict, feature_names: list[str]) -> float:
     return round(float(np.clip(prediction, 0.0, 10.0)), 2)
 
 
-# ---------------------------------------------------------------------------
+
 # Strength & Weakness Analysis
-# ---------------------------------------------------------------------------
+
 
 STRENGTH_RULES = [
     # (label, condition_fn)
@@ -183,9 +180,9 @@ def identify_weaknesses(features: dict, max_weaknesses: int = 3) -> list[str]:
     ][:max_weaknesses]
 
 
-# ---------------------------------------------------------------------------
+
 # Activity Level Classification
-# ---------------------------------------------------------------------------
+
 
 def classify_activity_level(features: dict) -> str:
     """
@@ -204,9 +201,8 @@ def classify_activity_level(features: dict) -> str:
         return "Inactive"
 
 
-# ---------------------------------------------------------------------------
+
 # Full Analysis Builder
-# ---------------------------------------------------------------------------
 
 def build_analysis(username: str, github_data: dict, features: dict) -> dict:
     """
