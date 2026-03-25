@@ -1,9 +1,4 @@
-"""
-FastAPI Application Entry Point
-=================================
-Wires together middleware, CORS, and all routers.
-Run with:  uvicorn backend.api.main:app --reload
-"""
+
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
