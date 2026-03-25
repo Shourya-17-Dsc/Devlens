@@ -30,9 +30,9 @@ FEATURE_ORDER = [
     "public_gists_count", "popularity_score",
 ]
 
-# ---------------------------------------------------------------------------
+
 # Model loader (cached at module level)
-# ---------------------------------------------------------------------------
+
 _model  = None
 _scaler = None
 
@@ -48,9 +48,9 @@ def _load_model():
     return _model, _scaler
 
 
-# ---------------------------------------------------------------------------
+
 # Heuristic fallback (used before model is trained)
-# ---------------------------------------------------------------------------
+
 
 def _heuristic_score(features: dict) -> float:
     """
@@ -81,9 +81,8 @@ def _heuristic_score(features: dict) -> float:
     return round(min(score, 10.0), 2)
 
 
-# ---------------------------------------------------------------------------
+
 # ML inference
-# ---------------------------------------------------------------------------
 
 def predict_skill_score(features: dict) -> float:
     """Run the ML model (or heuristic fallback) and return a 0-10 float."""
@@ -99,9 +98,8 @@ def predict_skill_score(features: dict) -> float:
     return round(max(0.0, min(raw, 10.0)), 2)
 
 
-# ---------------------------------------------------------------------------
+
 # Strength / Weakness analyser
-# ---------------------------------------------------------------------------
 
 def analyse_strengths_weaknesses(features: dict,
                                   top_languages: list[str],
@@ -176,9 +174,8 @@ def analyse_strengths_weaknesses(features: dict,
     return {"strengths": strengths[:6], "weaknesses": weaknesses[:4]}
 
 
-# ---------------------------------------------------------------------------
+
 # Activity level label
-# ---------------------------------------------------------------------------
 
 def classify_activity_level(features: dict) -> str:
     freq  = features.get("commit_frequency", 0)
