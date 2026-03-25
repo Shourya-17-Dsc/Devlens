@@ -1,12 +1,4 @@
-"""
-Train with Real Data
-====================
-Trains the ML model using real GitHub developer data instead of synthetic data.
 
-This produces a much more accurate model based on actual developer patterns.
-
-Usage:
-  python train_with_real_data.py --input real_developers_expanded.csv
 """
 
 import os, json, logging, joblib
