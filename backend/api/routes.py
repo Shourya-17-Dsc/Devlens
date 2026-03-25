@@ -1,13 +1,4 @@
-"""
-FastAPI Routes
-==============
-Defines the REST API endpoints exposed by the backend.
 
-Endpoints:
-  GET /analyze/{username}   – full profile analysis
-  GET /health               – liveness check
-  GET /cache/{username}     – retrieve a previously cached analysis
-"""
 
 from fastapi import APIRouter, HTTPException, BackgroundTasks
 from fastapi.responses import JSONResponse
