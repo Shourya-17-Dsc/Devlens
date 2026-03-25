@@ -1,11 +1,9 @@
 """
-collect_real_data.py
-=====================
+
 Fetches real GitHub developer profiles and builds a labeled
 training dataset using proxy scoring.
 
-Run:
-    python collect_real_data.py --output dataset.csv --count 500
+
 """
 
 import asyncio
@@ -60,7 +58,7 @@ SEED_USERS = {
 }
 
 
-# ── GitHub API helpers ────────────────────────────────────────────────────────
+# ── GitHub API helpers
 
 async def safe_get(client: httpx.AsyncClient, url: str, params=None) -> dict | list | None:
     """GET with retry on rate limit."""
@@ -107,8 +105,7 @@ async def fetch_commit_activity(client, username: str, repo_name: str) -> list:
     return data if isinstance(data, list) else []
 
 
-# ── Feature extraction ────────────────────────────────────────────────────────
-
+# ── Feature extraction 
 def _days_since(iso_str: str | None) -> float:
     if not iso_str:
         return 9999.0
@@ -218,8 +215,7 @@ def compute_proxy_label(features: dict, manual_score: float | None = None) -> fl
     return round(max(0.0, min(score, 10.0)), 2)
 
 
-# ── GitHub Search: discover more users ───────────────────────────────────────
-
+# ── GitHub Search: discover more users 
 async def discover_users_via_search(client, count: int = 400) -> list[str]:
     """
     Use GitHub Search API to discover real developers at various skill levels.
@@ -253,7 +249,7 @@ async def discover_users_via_search(client, count: int = 400) -> list[str]:
     return list(dict.fromkeys(discovered))  # deduplicate, preserve order
 
 
-# ── Per-user data collection ──────────────────────────────────────────────────
+# ── Per-user data collection 
 
 async def collect_user_data(client, username: str, manual_score=None) -> dict | None:
     """Collect all data for one user and return a labeled feature row."""
@@ -295,7 +291,7 @@ async def collect_user_data(client, username: str, manual_score=None) -> dict | 
     }
 
 
-# ── Main orchestrator ─────────────────────────────────────────────────────────
+# ── Main orchestrator 
 
 async def build_dataset(output_path: str, target_count: int):
     rows = []
