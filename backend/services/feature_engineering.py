@@ -4,7 +4,7 @@ Feature Engineering Pipeline
 Converts raw GitHub API data into a numerical feature vector
 that the ML model can consume.
 
-Each feature is documented with its purpose and expected range.
+
 """
 
 import math
@@ -30,9 +30,8 @@ def _days_since(iso_str: str | None) -> float:
     dt = datetime.fromisoformat(iso_str.rstrip("Z")).replace(tzinfo=timezone.utc)
     return (datetime.now(timezone.utc) - dt).days
 
-# ---------------------------------------------------------------------------
+
 # Individual feature extractors
-# ---------------------------------------------------------------------------
 
 def extract_repo_features(repos: list[dict]) -> dict:
     """
