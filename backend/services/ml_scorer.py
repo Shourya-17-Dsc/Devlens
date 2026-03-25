@@ -3,8 +3,7 @@ ml_scorer.py
 ============
 Loads the trained skill model and runs inference for a given feature dict.
 
-The MLScorer is a singleton — the model is loaded once at startup
-and reused across all API requests (important for performance).
+
 """
 
 import json
