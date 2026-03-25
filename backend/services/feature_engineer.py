@@ -58,10 +58,9 @@ class FeatureEngineer:
         logger.debug(f"Extracted {len(features)} features")
         return features
 
-    # ------------------------------------------------------------------
+   
     # Feature groups
-    # ------------------------------------------------------------------
-
+    
     def _repo_features(self, repos: list) -> dict:
         """
         Measures breadth and volume of repository work.
