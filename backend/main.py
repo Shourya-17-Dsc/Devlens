@@ -1,5 +1,10 @@
 
 
+# Load environment variables FIRST — before any service imports that read os.getenv()
+from pathlib import Path
+from dotenv import load_dotenv
+load_dotenv(dotenv_path=Path(__file__).resolve().parent / ".env")
+
 import logging
 from contextlib import asynccontextmanager
 
@@ -52,8 +57,10 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "http://localhost:3000",    # Next.js dev
-        "https://your-app.vercel.app",  # Production (update this)
+        "http://localhost:3000",
+        "http://localhost:3001",
+        "http://localhost:3002",
+        "https://your-app.vercel.app",
     ],
     allow_credentials=True,
     allow_methods=["*"],

@@ -24,9 +24,9 @@ def _safe_div(a: float, b: float, default: float = 0.0) -> float:
     return a / b if b > 0 else default
 
 def _days_since(iso_str: str | None) -> float:
-    """Return days elapsed since an ISO-8601 timestamp (or 9999 if missing)."""
+    """Return days elapsed since an ISO-8601 timestamp (or 0 if missing)."""
     if not iso_str:
-        return 9999.0
+        return 0.0
     dt = datetime.fromisoformat(iso_str.rstrip("Z")).replace(tzinfo=timezone.utc)
     return (datetime.now(timezone.utc) - dt).days
 
@@ -51,8 +51,14 @@ def extract_repo_features(repos: list[dict]) -> dict:
             "repo_count","total_stars","total_forks","avg_stars_per_repo",
             "max_stars_single_repo","fork_ratio","has_description_ratio",
             "avg_repo_size_kb","recent_repo_count","open_source_ratio"]}
-
+    repos = [r for r in repos if isinstance(r, dict)]
     n = len(repos)
+    if n == 0:
+        return {k: 0.0 for k in [
+            "repo_count","total_stars","total_forks","avg_stars_per_repo",
+            "max_stars_single_repo","fork_ratio","has_description_ratio",
+            "avg_repo_size_kb","recent_repo_count","open_source_ratio"]}
+
     stars  = [r.get("stargazers_count", 0) for r in repos]
     forks  = [r.get("forks_count", 0)      for r in repos]
     sizes  = [r.get("size", 0)             for r in repos]
@@ -111,10 +117,10 @@ def extract_activity_features(commits: list[dict], profile: dict) -> dict:
     account_age = _days_since(profile.get("created_at"))
 
     if commits:
-        totals = [w.get("total", 0) for w in commits]
-        commit_freq    = _safe_div(sum(totals), len(totals))
+        totals = [w.get("total", 0) for w in commits if isinstance(w, dict)]
+        commit_freq    = _safe_div(sum(totals), len(totals)) if totals else 0.0
         active_weeks   = sum(1 for t in totals if t > 0)
-        active_ratio   = _safe_div(active_weeks, len(totals))
+        active_ratio   = _safe_div(active_weeks, len(totals)) if totals else 0.0
     else:
         commit_freq  = 0.0
         active_ratio = 0.0
@@ -133,10 +139,16 @@ def extract_popularity_score(features: dict) -> dict:
     """
     Composite popularity_score (0–100) derived from stars + forks + followers.
     Uses log-scaling to prevent mega-repos from dominating.
+
+    Guard: followers don't contribute when the user has 0 repos, so an
+    empty account with social presence doesn't get an inflated signal.
     """
     stars     = features.get("total_stars", 0)
     forks     = features.get("total_forks", 0)
-    followers = features.get("follower_count", 0)
+    repo_count = features.get("repo_count", 0)
+
+    # Only count followers if the user has actual repositories
+    followers = features.get("follower_count", 0) if repo_count > 0 else 0
 
     score = (math.log1p(stars)     * 3.0 +
              math.log1p(forks)     * 2.0 +
@@ -157,10 +169,10 @@ def build_feature_vector(raw_data: dict) -> dict:
     Takes raw_data from github_client.collect_all_data()
     and returns a flat dict of floats ready for the ML model.
     """
-    profile   = raw_data.get("profile", {})
-    repos     = raw_data.get("repos",   [])
-    languages = raw_data.get("languages", {})
-    commits   = raw_data.get("commits", [])
+    profile   = raw_data.get("profile") or {}
+    repos     = raw_data.get("repos") or []
+    languages = raw_data.get("languages") or {}
+    commits   = raw_data.get("commits") or []
 
     repo_feats  = extract_repo_features(repos)
     lang_feats  = extract_language_features(languages)
