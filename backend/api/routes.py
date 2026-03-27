@@ -9,6 +9,7 @@ from backend.services.feature_engineering import build_feature_vector
 from backend.services.skill_scorer        import (
     predict_skill_score, analyse_strengths_weaknesses, classify_activity_level
 )
+from backend.services.radar_scorer        import extract_skill_radar
 from backend.database.db                 import save_analysis, get_cached_analysis
 
 router = APIRouter()
@@ -49,6 +50,13 @@ async def analyze_developer(username: str, background_tasks: BackgroundTasks):
     # ── 2. GitHub data collection ─────────────────────────────────────────
     try:
         raw_data = await collect_all_data(username)
+        logger.info(
+            "[%s] Raw data: %d repos, %d languages, %d commit-weeks",
+            username,
+            len(raw_data.get("repos", [])),
+            len(raw_data.get("languages", {})),
+            len(raw_data.get("commits", [])),
+        )
     except Exception as exc:
         status = getattr(getattr(exc, "response", None), "status_code", 500)
         if status == 404:
@@ -69,12 +77,15 @@ async def analyze_developer(username: str, background_tasks: BackgroundTasks):
     top_languages = eng["top_languages"]
     all_languages = eng["all_languages"]
     repos         = eng["repos"]
-    profile       = raw_data["profile"]
+    profile       = raw_data.get("profile") or {}
 
     # ── 4. ML scoring ─────────────────────────────────────────────────────
     skill_score    = predict_skill_score(features)
     sw             = analyse_strengths_weaknesses(features, top_languages, repos)
     activity_level = classify_activity_level(features)
+
+    # ── 4b. Skill Radar scoring ───────────────────────────────────────────
+    radar_scores = extract_skill_radar(raw_data)
 
     # ── 5. Build response payload ─────────────────────────────────────────
     # Create language breakdown dict from top languages
@@ -118,6 +129,7 @@ async def analyze_developer(username: str, background_tasks: BackgroundTasks):
             "popularity_score":  round(features.get("popularity_score", 0), 2),
             "account_age_days":  int(features.get("account_age_days", 0)),
         },
+        "radar_scores":      radar_scores,
         "repositories":      formatted_repos,
         "features":          {k: round(v, 4) for k, v in features.items()},
         "fetched_at":        raw_data["fetched_at"],

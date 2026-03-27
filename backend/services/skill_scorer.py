@@ -56,7 +56,16 @@ def _heuristic_score(features: dict) -> float:
     """
     Rule-based score (0-10) when the ML model isn't available.
     Weighted sum of normalised features.
+
+    Guard: profiles with 0 repos always score 0.0.
+    Soft penalty: profiles with < 5 repos are scaled down proportionally.
     """
+    repo_count = features.get("repo_count", 0)
+
+    # Hard guard — no repos means no score
+    if repo_count == 0:
+        return 0.0
+
     w = {
         "repo_count":          0.10,
         "avg_stars_per_repo":  0.15,
@@ -78,6 +87,11 @@ def _heuristic_score(features: dict) -> float:
         val = features.get(feat, 0)
         norm = norms.get(feat, 1)
         score += weight * min(val / norm, 1.0) * 10
+
+    # Soft multiplier — penalise very sparse profiles (1–4 repos)
+    if repo_count < 5:
+        score = score * (repo_count / 5.0)
+
     return round(min(score, 10.0), 2)
 
 
@@ -86,6 +100,10 @@ def _heuristic_score(features: dict) -> float:
 
 def predict_skill_score(features: dict) -> float:
     """Run the ML model (or heuristic fallback) and return a 0-10 float."""
+    # Hard guard — always applied regardless of ML or heuristic path
+    if features.get("repo_count", 0) == 0:
+        return 0.0
+
     model, scaler = _load_model()
 
     if model is None:
@@ -95,6 +113,12 @@ def predict_skill_score(features: dict) -> float:
     x = np.array([[features.get(f, 0.0) for f in FEATURE_ORDER]])
     x_scaled = scaler.transform(x)
     raw = float(model.predict(x_scaled)[0])
+
+    # Soft multiplier — penalise sparse profiles even for ML path
+    repo_count = features.get("repo_count", 0)
+    if repo_count < 5:
+        raw = raw * (repo_count / 5.0)
+
     return round(max(0.0, min(raw, 10.0)), 2)
 
 

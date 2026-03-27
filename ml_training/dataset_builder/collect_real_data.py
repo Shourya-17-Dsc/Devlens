@@ -49,6 +49,7 @@ SEED_USERS = {
     # Advanced tier (score ~6.5–8.4)
     "mxstbr": 8.0, "wesbos": 7.8, "paulirish": 7.9,
     "getify": 7.7, "addyosmani": 7.8, "bmizerany": 7.5,
+    "shreeya":0,
 
     # Intermediate tier (score ~3.5–6.4)
     # (These will mostly come from GitHub Search discovery)

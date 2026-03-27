@@ -1,8 +1,12 @@
 {
-  "mae": 0.14543132824003696,
-  "r2": 0.9960682617476315,
-  "cv_mae": 0.1676278176896274,
+  "mae": 0.15167030914409751,
+  "r2": 0.9651414799282655,
+  "cv_mae": 0.23809369362738977,
+  "cv_std": 0.043858254927552506,
   "n_features": 21,
-  "n_train": 1600,
-  "model_type": "XGBRegressor"
+  "n_train": 589,
+  "model_type": "XGBRegressor",
+  "data_source": "real_github_hybrid",
+  "real_samples": 79,
+  "synthetic_samples": 500
 }
